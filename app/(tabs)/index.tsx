@@ -1,98 +1,133 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import CategoryCard from '../../components/CategoryCard';
+import ProductCard from '../../components/ProductCard';
+import { Colors, FontSizes, Spacing } from '../../constants/theme';
+import { categories, products } from '../../data/products';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [activeCategory, setActiveCategory] = useState("All");
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <View style={styles.logoBox}>
+            <Ionicons name="school" size={24} color={Colors.white} />
+          </View>
+          <Text style={styles.headerTitle}>Prashanthi Uniforms</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.iconBtn}>
+            <Ionicons name="search" size={24} color={Colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/(tabs)/cart')}>
+            <Ionicons name="bag-outline" size={24} color={Colors.text} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
+        <View style={styles.heroBanner}>
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTitle}>Quality Uniforms for Every School</Text>
+            <Text style={styles.heroSubtitle}>Premium fabrics, perfect fit, durable design.</Text>
+            <TouchableOpacity style={styles.heroBtn} onPress={() => router.push({ pathname: '/product-list', params: { category: 'School Uniforms' } })}>
+              <Text style={styles.heroBtnText}>Shop New Season</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.brandingCard}>
+          <View style={styles.brandingLeft}>
+            <View style={styles.brandingIcon}>
+              <Ionicons name="checkmark-circle" size={28} color={Colors.white} />
+            </View>
+            <View>
+              <Text style={styles.brandingTitle}>Custom Branding</Text>
+              <Text style={styles.brandingSubtitle}>School logo embroidery services</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.inquireBtn}>
+            <Text style={styles.inquireBtnText}>Inquire</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.categorySection}>
+          <View style={styles.categoryHeader}>
+            <Text style={styles.sectionTitle}>Shop by Category</Text>
+            <TouchableOpacity onPress={() => router.push('/product-list')}>
+              <Text style={styles.viewAll}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+            {categories.map((cat) => (
+              <CategoryCard
+                key={cat.id}
+                name={cat.name}
+                icon={cat.icon}
+                onPress={() => router.push({ pathname: '/product-list', params: { category: cat.name } })}
+              />
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Top Picks for You</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productList}>
+            {products.slice(0, 4).map((item) => (
+              <View key={item.id} style={{ width: 180, marginRight: Spacing.md }}>
+                <ProductCard
+                  name={item.name}
+                  school={item.school}
+                  price={item.price}
+                  image={item.image}
+                  onPress={() => router.push({ pathname: '/product-detail', params: { id: item.id } })}
+                  onAddToCart={() => router.push('/(tabs)/cart')}
+                  onWishlist={() => { }}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  container: { flex: 1, backgroundColor: Colors.backgroundLight },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.lg, paddingVertical: Spacing.lg, backgroundColor: Colors.white, paddingTop: Spacing.xxl },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  logoBox: { width: 40, height: 40, borderRadius: 8, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.text },
+  headerRight: { flexDirection: 'row', gap: Spacing.md },
+  iconBtn: { padding: Spacing.xs },
+  heroBanner: { height: 220, marginHorizontal: Spacing.lg, marginTop: Spacing.lg, borderRadius: 12, backgroundColor: '#2F8D8B', overflow: 'hidden', position: 'relative' },
+  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
+  heroContent: { flex: 1, justifyContent: 'center', padding: Spacing.xl },
+  heroTitle: { fontSize: FontSizes.xl, fontWeight: '700', color: Colors.white, marginBottom: Spacing.sm },
+  heroSubtitle: { fontSize: FontSizes.md, color: Colors.white, marginBottom: Spacing.lg, opacity: 0.95 },
+  heroBtn: { alignSelf: 'flex-start', backgroundColor: Colors.primary, paddingVertical: Spacing.md, paddingHorizontal: Spacing.xl, borderRadius: 8 },
+  heroBtnText: { color: Colors.white, fontWeight: '700', fontSize: FontSizes.md },
+  brandingCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, marginHorizontal: Spacing.lg, marginTop: Spacing.xl, padding: Spacing.xl, borderRadius: 12 },
+  brandingLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  brandingIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  brandingTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.text },
+  brandingSubtitle: { fontSize: FontSizes.sm, color: Colors.textMuted, marginTop: 2 },
+  inquireBtn: { backgroundColor: Colors.primary, paddingVertical: Spacing.md, paddingHorizontal: Spacing.xl, borderRadius: 8 },
+  inquireBtnText: { color: Colors.white, fontWeight: '700', fontSize: FontSizes.md },
+  categorySection: { marginTop: Spacing.xl, marginBottom: Spacing.lg },
+  categoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
+  sectionTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.text },
+  viewAll: { fontSize: FontSizes.md, color: Colors.primary, fontWeight: '600' },
+  categoryRow: { paddingHorizontal: Spacing.lg, gap: Spacing.lg },
+  section: { marginTop: Spacing.lg },
+  sectionHeader: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
+  productList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
 });
