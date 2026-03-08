@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# Prashanthi Uniforms Application
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This repository contains the full stack codebase for **Prashanthi Uniforms**, powered by Firebase. Everything—from the consumer view to the admin dashboard—is contained within this single highly-dynamic React Native (Expo) application.
 
-## Get started
+## Prerequisites
+- Node.js (v18+)
+- Firebase Project setup with Authentication (Email/Password) and Cloud Firestore enabled.
 
-1. Install dependencies
+## 1. Firebase Configuration
 
+1. Go to your Firebase Console and find your Web App configuration (API Key, Project ID, etc.).
+2. In the mobile app root folder, open `firebaseConfig.js` and paste your credentials into the `firebaseConfig` object.
+
+### Security Rules
+To ensure secure access, navigate to the Rules tab of your Firestore Database in the Firebase Console and copy the contents of `firestore.rules` (found in the root) into it.
+
+### Seeding Data
+To populate your app with sample schools and products:
+1. Generate a Service Account Key in Firebase (Project Settings > Service Accounts > Generate new private key).
+2. Save it as `serviceAccountKey.json` inside the `scripts` folder.
+3. Open a terminal in the root folder and run:
    ```bash
-   npm install
+   cd scripts
+   npm install firebase-admin
+   node seed.js
    ```
 
-2. Start the app
+## 2. Running the App (React Native)
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+From the project root folder:
 ```bash
-npm run reset-project
+npm install
+npm run start
 ```
+You can use the Expo Go app on your physical device, or press `a` for Android Emulator / `i` for iOS Simulator.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Accessing the Admin Dashboard
+The Admin Dashboard is built directly into the mobile application! To access it:
+1. Create a user via the mobile app register page.
+2. Open Firestore, navigate to the `users` collection, find your user ID document.
+3. Add a String field `role` and set its value exactly to `admin`.
+4. Refresh the mobile app, go to your **Profile** tab, and you will see a new **ADMINISTRATION > Admin Dashboard** section.
+5. Tap it to securely manage schools, products, and incoming orders natively from your phone.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+**Powered by Antigravity**

@@ -36,14 +36,23 @@ export default function SignupScreen() {
 
     try {
       await signup(fullName, email, password);
-    } catch (error) {
-      Alert.alert('Error', 'Signup failed. Please try again.');
+    } catch (error: any) {
+      if (error instanceof Error) {
+        Alert.alert('Error', error.message);
+      } else if (error.message) {
+        Alert.alert('Error', error.message);
+      } else {
+        Alert.alert('Error', 'Signup failed. Please try again.');
+      }
     }
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.backBtn} onPress={() => {
+        if (router.canGoBack()) router.back();
+        else router.replace('/(auth)/login');
+      }}>
         <Ionicons name="chevron-back" size={24} color={Colors.primary} />
       </TouchableOpacity>
 

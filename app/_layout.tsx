@@ -14,8 +14,12 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="product-list" />
+          <Stack.Screen name="admin" />
           <Stack.Screen name="product-detail" />
+          <Stack.Screen name="product-list" />
+          <Stack.Screen name="checkout" />
+          <Stack.Screen name="orders" />
+          <Stack.Screen name="order-confirmation" />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
         <StatusBar style="dark" />

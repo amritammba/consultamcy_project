@@ -64,9 +64,11 @@ export default function CatalogScreen() {
             school={item.school}
             price={item.price}
             image={item.image}
+            category={item.category || ''}
             isWishlisted={wishlistedIds.includes(item.id)}
             onWishlist={() => toggleWishlist(item.id)}
-            onPress={() => router.push({ pathname: '/product-detail', params: { productId: item.id } })}
+            onAddToCart={() => {}}
+            onPress={() => router.push({ pathname: '/product-detail', params: { id: item.id } })}
           />
         )}
       />

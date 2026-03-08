@@ -12,7 +12,11 @@ export default function ProductCard({
   onAddToCart,
   onWishlist,
   isWishlisted = false,
+  stock = 1,
+  category,
 }) {
+  const isOutOfStock = stock === 0;
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.imageContainer}>
@@ -30,14 +34,26 @@ export default function ProductCard({
         </TouchableOpacity>
       </View>
       <View style={styles.details}>
-        <Text style={styles.school} numberOfLines={1}>
-          {school}
-        </Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.school} numberOfLines={1}>{school}</Text>
+          {category && <Text style={styles.category}>{category}</Text>}
+        </View>
         <Text style={styles.name} numberOfLines={2}>
           {name}
         </Text>
         <Text style={styles.price}>₹{price.toLocaleString('en-IN')}</Text>
-        <TouchableOpacity style={styles.addToCartBtn} onPress={onAddToCart || onPress}>
+        
+        <View style={styles.stockRow}>
+           <Text style={[styles.stockStatus, { color: isOutOfStock ? Colors.error : Colors.success }]}>
+             {isOutOfStock ? 'Out of Stock' : 'In Stock'}
+           </Text>
+        </View>
+
+        <TouchableOpacity 
+          style={[styles.addToCartBtn, isOutOfStock && styles.addToCartDisabled]} 
+          onPress={isOutOfStock ? null : (onAddToCart || onPress)}
+          disabled={isOutOfStock}
+        >
           <Ionicons name="cart-outline" size={16} color={Colors.white} />
           <Text style={styles.addToCartText}>Add to Cart</Text>
         </TouchableOpacity>
@@ -105,4 +121,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: FontSizes.sm,
   },
+  addToCartDisabled: {
+    backgroundColor: Colors.textMuted,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  category: {
+    fontSize: 10,
+    backgroundColor: Colors.backgroundLight,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    color: Colors.textMuted,
+  },
+  stockRow: {
+    marginBottom: Spacing.sm,
+  },
+  stockStatus: {
+    fontSize: 12,
+    fontWeight: '600',
+  }
 });

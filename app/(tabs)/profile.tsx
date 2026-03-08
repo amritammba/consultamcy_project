@@ -23,6 +23,8 @@ export default function ProfileScreen() {
   const handleMenuItemPress = (label: string) => {
     if (label === 'Logout') {
       handleLogout();
+    } else if (label === 'My Orders') {
+      router.push('/orders');
     }
   };
 
@@ -54,8 +56,33 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user?.name || 'Guest User'}</Text>
           <Text style={styles.membership}>{user ? 'Premium Member' : 'Welcome!'}</Text>
           <Text style={styles.email}>{user?.email || 'Please login to continue'}</Text>
-          {user && <Text style={styles.phone}>+91 98765 43210</Text>}
+          {user && <Text style={styles.phone}>User ID: {user.uid?.substring(0, 8)}</Text>}
+          
+          {user?.role === 'admin' && (
+            <View style={{marginTop: Spacing.md, backgroundColor: '#E0E7FF', paddingHorizontal: 16, paddingVertical: 4, borderRadius: 20}}>
+              <Text style={{color: '#4338CA', fontWeight: '700', fontSize: 12}}>ADMINISTRATOR</Text>
+            </View>
+          )}
         </View>
+
+        {user?.role === 'admin' && (
+          <View style={styles.menuSection}>
+            <Text style={styles.sectionHeader}>ADMINISTRATION</Text>
+            <View style={styles.menuList}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => router.push('/admin')}
+              >
+                <View style={[styles.menuIconBg, { backgroundColor: '#E0E7FF' }]}>
+                  <Ionicons name="settings-outline" size={22} color="#4338CA" />
+                </View>
+                <Text style={styles.menuLabel}>Admin Dashboard</Text>
+                <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {MENU_ITEMS.map((s) => (
           <View key={s.section} style={styles.menuSection}>
             <Text style={styles.sectionHeader}>{s.section}</Text>

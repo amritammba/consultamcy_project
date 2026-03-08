@@ -1,14 +1,44 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import CategoryCard from '../../components/CategoryCard';
 import ProductCard from '../../components/ProductCard';
 import { Colors, FontSizes, Spacing } from '../../constants/theme';
-import { categories, products } from '../../data/products';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 export default function HomeScreen() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [schools, setSchools] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const schoolsSnap = await getDocs(collection(db, 'schools'));
+      const schoolsData = schoolsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSchools(schoolsData);
+
+      const productsQuery = query(collection(db, 'products'), limit(4));
+      const productsSnap = await getDocs(productsQuery);
+      const productsData = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTopProducts(productsData);
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRandomIcon = (index: number) => {
+    const icons = ['school-outline', 'book-outline', 'library-outline', 'business-outline'];
+    return icons[index % icons.length];
+  };
 
   return (
     <View style={styles.container}>
@@ -20,7 +50,7 @@ export default function HomeScreen() {
           <Text style={styles.headerTitle}>Prashanthi Uniforms</Text>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.iconBtn}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/(tabs)/search')}>
             <Ionicons name="search" size={24} color={Colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/(tabs)/cart')}>
@@ -34,7 +64,7 @@ export default function HomeScreen() {
           <View style={styles.heroContent}>
             <Text style={styles.heroTitle}>Quality Uniforms for Every School</Text>
             <Text style={styles.heroSubtitle}>Premium fabrics, perfect fit, durable design.</Text>
-            <TouchableOpacity style={styles.heroBtn} onPress={() => router.push({ pathname: '/product-list', params: { category: 'School Uniforms' } })}>
+            <TouchableOpacity style={styles.heroBtn} onPress={() => router.push('/product-list')}>
               <Text style={styles.heroBtnText}>Shop New Season</Text>
             </TouchableOpacity>
           </View>
@@ -55,45 +85,53 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.categorySection}>
-          <View style={styles.categoryHeader}>
-            <Text style={styles.sectionTitle}>Shop by Category</Text>
-            <TouchableOpacity onPress={() => router.push('/product-list')}>
-              <Text style={styles.viewAll}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
-            {categories.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                name={cat.name}
-                icon={cat.icon}
-                onPress={() => router.push({ pathname: '/product-list', params: { category: cat.name } })}
-              />
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Top Picks for You</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productList}>
-            {products.slice(0, 4).map((item) => (
-              <View key={item.id} style={{ width: 180, marginRight: Spacing.md }}>
-                <ProductCard
-                  name={item.name}
-                  school={item.school}
-                  price={item.price}
-                  image={item.image}
-                  onPress={() => router.push({ pathname: '/product-detail', params: { id: item.id } })}
-                  onAddToCart={() => router.push('/(tabs)/cart')}
-                  onWishlist={() => { }}
-                />
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 40 }} />
+        ) : (
+          <>
+            <View style={styles.categorySection}>
+              <View style={styles.categoryHeader}>
+                <Text style={styles.sectionTitle}>Shop by School</Text>
+                <TouchableOpacity onPress={() => router.push('/product-list')}>
+                  <Text style={styles.viewAll}>View All</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </ScrollView>
-        </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+                {schools.map((school, index) => (
+                  <CategoryCard
+                    key={school.id}
+                    name={school.schoolName}
+                    icon={getRandomIcon(index)}
+                    onPress={() => router.push({ pathname: '/product-list', params: { schoolId: school.schoolId, schoolName: school.schoolName } })}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Top Picks for You</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productList}>
+                {topProducts.map((item) => (
+                  <View key={item.id} style={{ width: 180, marginRight: Spacing.md }}>
+                    <ProductCard
+                      name={item.productName}
+                      school={item.schoolName || item.schoolId || ''}
+                      price={item.price}
+                      image={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }}
+                      category={item.category || ''}
+                      stock={item.stock ?? 1}
+                      onPress={() => router.push({ pathname: '/product-detail', params: { id: item.id } })}
+                      onAddToCart={() => router.push('/(tabs)/cart')}
+                      onWishlist={() => { }}
+                    />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          </>
+        )}
 
       </ScrollView>
     </View>

@@ -9,8 +9,8 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textMuted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
-        tabBarStyle: { backgroundColor: Colors.white },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+        tabBarStyle: { backgroundColor: Colors.white, borderTopColor: Colors.borderLight },
       }}
     >
       <Tabs.Screen
@@ -21,17 +21,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="catalog"
+        name="search"
         options={{
-          title: 'Catalog',
-          tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="wishlist"
-        options={{
-          title: 'Wishlist',
-          tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
+          title: 'Search',
+          tabBarIcon: ({ color, size }) => <Ionicons name="search" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -42,11 +35,30 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="wishlist"
+        options={{
+          title: 'Wishlist',
+          tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="orders"
+        options={{
+          title: 'Orders',
+          tabBarIcon: ({ color, size }) => <Ionicons name="list-outline" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
+      />
+      {/* Hide the old catalog screen from the tab bar */}
+      <Tabs.Screen
+        name="catalog"
+        options={{ href: null }}
       />
     </Tabs>
   );
